@@ -9,13 +9,6 @@
     <OutputType>Library</OutputType>
   </PropertyGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\PluginBase\PluginBase.csproj">
-			<Private>false</Private>
-			<ExcludeAssets>runtime</ExcludeAssets>
-		</ProjectReference>
-	</ItemGroup>
-
   <ItemGroup>
     <Folder Include="Resources\" />
   </ItemGroup>
@@ -31,6 +24,13 @@
 	  </PackageReference>
 	  <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.8">
 	  </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BroadcastPluginSDK\PluginBase.csproj" >
+			<Private>false</Private>
+			<ExcludeAssets>runtime</ExcludeAssets>
+		</ProjectReference>
   </ItemGroup>
 
   <ItemGroup>

@@ -14,7 +14,7 @@ using static System.Collections.Specialized.BitVector32;
 
 namespace APIPlugin
 {
-    public class Plugin : BroadcastPlugin 
+    public class Plugin : BroadcastPlugin , IPlugin
     {
         #region Private Fields
         #endregion
@@ -30,7 +30,7 @@ namespace APIPlugin
             Description = "Plugin provides a REST API.";
             Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0";
             Icon = Properties.Resources.red;
-
+            Debug.WriteLine($"Plugin {Name} initialized with version {Version}");
         }
         public override bool AttachConfiguration<T>(T configuration)
         {
