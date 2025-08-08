@@ -5,10 +5,20 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Platforms>AnyCPU;x64</Platforms>
-    <BaseOutputPath>C:\Users\steve\source\repos\sfawcett123\Broadcast2\Broadcast\Broadcast\bin</BaseOutputPath>
     <OutputType>Library</OutputType>
+    <PackageDir Condition="'$(PackageDir)' == ''">$([System.IO.Path]::Combine($(OutputPath),'package'))/</PackageDir>
+	<PackagePath> c:\plugins\API.zip</PackagePath>
+    
   </PropertyGroup>
 
+	<Target Name="Package" DependsOnTargets="Publish">
+		<MakeDir Directories="$(PackageDir)" />
+		<ZipDirectory Overwrite="true" SourceDirectory="$(MSBuildProjectDirectory)/$(PublishDir)" DestinationFile="$(PackagePath)" />
+	</Target>
+	<Target Name="PackageClean" AfterTargets="Clean">
+		<Delete Files="$(PackagePath)" />
+	</Target>
+	
   <ItemGroup>
     <Folder Include="Resources\" />
   </ItemGroup>
