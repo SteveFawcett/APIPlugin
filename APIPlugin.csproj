@@ -8,6 +8,8 @@
     <OutputType>Library</OutputType>
     <PackageDir Condition="'$(PackageDir)' == ''">$([System.IO.Path]::Combine($(OutputPath),'package'))/</PackageDir>
 	<PackagePath> c:\plugins\API.zip</PackagePath>
+	<SignAssembly>False</SignAssembly>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
     
   </PropertyGroup>
 
@@ -21,6 +23,13 @@
 	
   <ItemGroup>
     <Folder Include="Resources\" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <None Include="..\MSFSPlugin\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -37,7 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BroadcastPluginSDK\PluginBase.csproj" >
+    <ProjectReference Include="..\BroadcastPluginSDK\PluginBase.csproj">
 			<Private>false</Private>
 			<ExcludeAssets>runtime</ExcludeAssets>
 		</ProjectReference>
