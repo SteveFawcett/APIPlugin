@@ -20,10 +20,11 @@
 	<Target Name="PackageClean" AfterTargets="Clean">
 		<Delete Files="$(PackagePath)" />
 	</Target>
-	
-  <ItemGroup>
-    <Folder Include="Resources\" />
-  </ItemGroup>
+	<ItemGroup>
+	  <Compile Remove="Resources\**" />
+	  <EmbeddedResource Remove="Resources\**" />
+	  <None Remove="Resources\**" />
+	</ItemGroup>
 	
   <ItemGroup>
     <None Include="..\MSFSPlugin\README.md">
