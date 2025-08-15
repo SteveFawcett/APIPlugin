@@ -57,13 +57,13 @@ public class PluginBase : BroadcastPluginBase
 
     public override GetCacheDataDelegate? GetCacheData
     {
-        get => Webhost.Services.GetRequiredService<PluginSettingsAccessor>().Current.GetCacheData;
-        set => Webhost.Services.GetRequiredService<PluginSettingsAccessor>().Current.GetCacheData = value;
+        get => _webhost.Services.GetRequiredService<PluginSettingsAccessor>().Current.GetCacheData;
+        set => _webhost.Services.GetRequiredService<PluginSettingsAccessor>().Current.GetCacheData = value;
     }
 
-    private IWebHost Webhost;
+    private readonly IWebHost _webhost;
 
-    private new IConfiguration? Configuration;
+    private new IConfiguration _configuration;
 
     public PluginBase()
     {
@@ -71,7 +71,11 @@ public class PluginBase : BroadcastPluginBase
         Description = "PluginBase provides a REST API.";
         Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0";
         Icon = Resources.red;
-        Debug.WriteLine($"PluginBase {Name} initialized with version {Version}");
+
+        var configurationBuilder = new ConfigurationBuilder();
+        _configuration = configurationBuilder.Build();
+
+        _webhost = CreateWebHostBuilder(_configuration); Debug.WriteLine($"PluginBase {Name} initialized with version {Version}");
     }
 
     public override bool AttachConfiguration<T>(T configuration)
@@ -86,22 +90,13 @@ public class PluginBase : BroadcastPluginBase
         Debug.WriteLine($"Attaching {Name} configuration to PluginBase");
         var configurationBuilder = new ConfigurationBuilder();
         configurationBuilder.AddInMemoryCollection(configSection);
-        Configuration = configurationBuilder.Build();
+        _configuration = configurationBuilder.Build();
         return true;
     }
 
-
-
     public override string Start()
     {
-        if (Configuration == null)
-        {
-            return ("API PluginBase Configuration is not set. Please attach configuration before starting the plugin.");
-        }
-
-        Webhost = CreateWebHostBuilder(Configuration);
-
-        Webhost.RunAsync();
+        _webhost.RunAsync();
         return string.Empty;
     }
 
