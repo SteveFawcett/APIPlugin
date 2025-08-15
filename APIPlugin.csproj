@@ -46,10 +46,6 @@
 		<PackageReference Include="BroadcastPluginSDK" Version="1.0.5" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <None Include=".github\workflows\dotnet-desktop.yml" />
-	</ItemGroup>
-
   <ItemGroup>
 	  <PackageReference Include="Microsoft.AspNetCore" Version="2.3.0">
 	  </PackageReference>
