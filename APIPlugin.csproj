@@ -43,7 +43,11 @@
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)' == 'Release'">
-		<PackageReference Include="BroadcastPluginSDK" Version="1.0.4" />
+		<PackageReference Include="BroadcastPluginSDK" Version="1.0.5" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include=".github\workflows\dotnet-desktop.yml" />
 	</ItemGroup>
 
   <ItemGroup>
