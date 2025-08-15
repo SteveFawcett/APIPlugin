@@ -36,17 +36,17 @@
 	  <EmbeddedResource Remove="Resources\**" />
 	  <None Remove="Resources\**" />
 	</ItemGroup>
-	
-  <ItemGroup>
-    <None Include="..\MSFSPlugin\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Include=".github\workflows\dotnet-desktop.yml" />
-  </ItemGroup>
+
+
+	<ItemGroup Condition="'$(Configuration)' == 'Debug'">
+		<ProjectReference Include="..\BroadcastPluginSDK\BroadcastPluginSDK.csproj" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Configuration)' == 'Release'">
+		<PackageReference Include="BroadcastPluginSDK" Version="1.0.4" />
+	</ItemGroup>
 
   <ItemGroup>
-	  <PackageReference Include="BroadcastPluginSDK" Version="1.0.4" />
 	  <PackageReference Include="Microsoft.AspNetCore" Version="2.3.0">
 	  </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.3.0">
