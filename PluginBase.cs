@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
+using System.Drawing;
 using System.Net;
 using System.Reflection;
 using System.Xml.Schema;
@@ -52,8 +53,6 @@ public class PluginBase : BroadcastPluginBase
     
     #region IPlugin Members
 
-    public override string Stanza => "API";
-    public override string Name => "API PluginBase";
 
     public override GetCacheDataDelegate? GetCacheData
     {
@@ -62,20 +61,15 @@ public class PluginBase : BroadcastPluginBase
     }
 
     private readonly IWebHost _webhost;
+    private  IConfiguration _configuration;
+    private static readonly Image s_icon = Resources.green;
 
-    private new IConfiguration _configuration;
-
-    public PluginBase()
+    public PluginBase() : base(null, null, s_icon, "API plugin", "API", "REST API Provider")
     {
-        Name = "API PluginBase";
-        Description = "PluginBase provides a REST API.";
-        Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0";
-        Icon = Resources.red;
-
         var configurationBuilder = new ConfigurationBuilder();
         _configuration = configurationBuilder.Build();
 
-        _webhost = CreateWebHostBuilder(_configuration); Debug.WriteLine($"PluginBase {Name} initialized with version {Version}");
+        _webhost = CreateWebHostBuilder(_configuration); Debug.WriteLine($"API plugin Started");
     }
 
     public override bool AttachConfiguration<T>(T configuration)
