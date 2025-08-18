@@ -72,7 +72,7 @@ public class PluginBase : BroadcastPluginBase
         _webhost = CreateWebHostBuilder(_configuration); Debug.WriteLine($"API plugin Started");
     }
 
-    public override bool AttachConfiguration<T>(T configuration)
+    public bool AttachConfiguration<T>(T configuration)
     {
         var configSection = configuration as Dictionary<string, string?>;
         if (configSection == null)
@@ -81,18 +81,18 @@ public class PluginBase : BroadcastPluginBase
             return false;
         }
 
-        Debug.WriteLine($"Attaching {Name} configuration to PluginBase");
+        //Debug.WriteLine($"Attaching {Name} configuration to PluginBase");
         var configurationBuilder = new ConfigurationBuilder();
         configurationBuilder.AddInMemoryCollection(configSection);
         _configuration = configurationBuilder.Build();
         return true;
     }
 
-    public override string Start()
-    {
-        _webhost.RunAsync();
-        return string.Empty;
-    }
+//    public override string Start()
+ //   {
+  //      _webhost.RunAsync();
+  //      return string.Empty;
+  //  }
 
     private static IWebHost CreateWebHostBuilder(IConfiguration configuration)
     {
