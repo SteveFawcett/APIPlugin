@@ -1,16 +1,12 @@
-﻿using APIPlugin.Properties;
-using BroadcastPluginSDK;
+﻿using System.Diagnostics;
+using APIPlugin.Properties;
+using BroadcastPluginSDK.abstracts;
+using BroadcastPluginSDK.Classes;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Diagnostics;
-using System.Drawing;
-using System.Net;
-using System.Reflection;
-using System.Xml.Schema;
 
 namespace APIPlugin;
 
@@ -20,6 +16,7 @@ public class PluginBase : BroadcastPluginBase
     {
         public GetCacheDataDelegate? GetCacheData;
     }
+
     public class PluginSettingsAccessor
     {
         public PluginSettings Current { get; set; } = new();
@@ -42,17 +39,13 @@ public class PluginBase : BroadcastPluginBase
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            
+            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
+
             app.UseMvc();
         }
     }
-    
-    #region IPlugin Members
 
+    #region IPlugin Members
 
     public override GetCacheDataDelegate? GetCacheData
     {
@@ -61,38 +54,16 @@ public class PluginBase : BroadcastPluginBase
     }
 
     private readonly IWebHost _webhost;
-    private  IConfiguration _configuration;
     private static readonly Image s_icon = Resources.green;
 
-    public PluginBase() : base(null, null, s_icon, "API plugin", "API", "REST API Provider")
+    public PluginBase(IConfiguration configuration) : base(configuration, null, s_icon, "API plugin", "API", "REST API Provider")
     {
-        var configurationBuilder = new ConfigurationBuilder();
-        _configuration = configurationBuilder.Build();
 
-        _webhost = CreateWebHostBuilder(_configuration); Debug.WriteLine($"API plugin Started");
+        _webhost = CreateWebHostBuilder( configuration.GetSection("API") );
+        _webhost.RunAsync();
+        Debug.WriteLine("API plugin Started");
     }
 
-    public bool AttachConfiguration<T>(T configuration)
-    {
-        var configSection = configuration as Dictionary<string, string?>;
-        if (configSection == null)
-        {
-            Debug.WriteLine($"API PluginBase Configuration section is not of type {typeof(T)}");
-            return false;
-        }
-
-        //Debug.WriteLine($"Attaching {Name} configuration to PluginBase");
-        var configurationBuilder = new ConfigurationBuilder();
-        configurationBuilder.AddInMemoryCollection(configSection);
-        _configuration = configurationBuilder.Build();
-        return true;
-    }
-
-//    public override string Start()
- //   {
-  //      _webhost.RunAsync();
-  //      return string.Empty;
-  //  }
 
     private static IWebHost CreateWebHostBuilder(IConfiguration configuration)
     {
