@@ -52,6 +52,7 @@ public class DataController : Controller
     private List<KeyValuePair<string, string>> CallCacheData(List<string> required)
     {
         if (_pluginSettings?.GetCacheData is null) throw new NotImplementedException("No Primary cache defined");
+
         var data = _pluginSettings.GetCacheData(required);
         Debug.WriteLine($"Data returned from GetCacheData: {data.Count} items");
         return data;

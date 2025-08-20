@@ -12,7 +12,7 @@ using System.Diagnostics;
 
 namespace APIPlugin;
 
-public class PluginBase : BroadcastPluginBase
+public class PluginBase : BroadcastPluginBase 
 {
     private const string Stanza = "API";
 
@@ -51,13 +51,14 @@ public class PluginBase : BroadcastPluginBase
 
     #region IPlugin Members
 
+    private IWebHost? _webhost;
+
     public override GetCacheDataDelegate? GetCacheData
     {
         get => _webhost.Services.GetRequiredService<PluginSettingsAccessor>().Current.GetCacheData;
         set => _webhost.Services.GetRequiredService<PluginSettingsAccessor>().Current.GetCacheData = value;
     }
 
-    private readonly IWebHost _webhost;
     private static readonly Image s_icon = Resources.green;
     private readonly ILogger<IPlugin> _logger;
 
@@ -65,11 +66,17 @@ public class PluginBase : BroadcastPluginBase
         base(configuration, null, s_icon,  Stanza)
     {
         _logger = logger;
-        _webhost = CreateWebHostBuilder( configuration.GetSection(Stanza) );
-        _webhost.RunAsync();
+        
+        _webhost = CreateWebHostBuilder(configuration.GetSection(Stanza));
+
+        Task.Run(() => InitializeWebHost(configuration));
     }
 
-        
+    private void InitializeWebHost(IConfiguration configuration)
+    {
+        _webhost.Run();
+    }
+
     private IWebHost CreateWebHostBuilder(IConfiguration configuration)
     {
         var address = $"http://{configuration["server"]}:{configuration["port"]}";
