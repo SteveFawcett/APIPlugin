@@ -70,7 +70,7 @@ jobs:
              -restore
              -p:Configuration=${{ matrix.configuration }}
              -p:OutputDirectory="${{ env.OutputDirectory }}" 
-             -p:Version="${{ env.Version }}"
+             -p:AssemblyVersion="${{ env.Version }}"
 
     - name: Upload package
       uses: actions/upload-artifact@v4
