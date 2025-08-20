@@ -14,8 +14,6 @@ namespace APIPlugin;
 
 public class PluginBase : BroadcastPluginBase
 {
-    private const string PluginName = "APIPlugin";
-    private const string PluginDescription = "REST API Plugin.";
     private const string Stanza = "API";
 
     public class PluginSettings
@@ -64,12 +62,11 @@ public class PluginBase : BroadcastPluginBase
     private readonly ILogger<IPlugin> _logger;
 
     public PluginBase(IConfiguration configuration , ILogger<IPlugin> logger ) :
-        base(configuration, null, s_icon, PluginName, Stanza, PluginDescription)
+        base(configuration, null, s_icon,  Stanza)
     {
         _logger = logger;
         _webhost = CreateWebHostBuilder( configuration.GetSection(Stanza) );
         _webhost.RunAsync();
-        _logger.LogInformation(PluginDescription);
     }
 
         
