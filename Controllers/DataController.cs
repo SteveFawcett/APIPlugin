@@ -1,8 +1,6 @@
-﻿using BroadcastPluginSDK;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Web;
+using Microsoft.AspNetCore.Mvc;
 using static APIPlugin.PluginBase;
 
 namespace APIPlugin.Controllers;
@@ -12,6 +10,7 @@ namespace APIPlugin.Controllers;
 public class DataController : Controller
 {
     private readonly PluginSettings _pluginSettings;
+
     public DataController(PluginSettingsAccessor accessor)
     {
         _pluginSettings = accessor.Current;
@@ -23,7 +22,7 @@ public class DataController : Controller
         try
         {
             var plugins = new List<string>();
-            return Ok(CallCacheData( plugins ));
+            return Ok(CallCacheData(plugins));
         }
 
         catch (Exception ex)
@@ -40,7 +39,7 @@ public class DataController : Controller
         {
             var decodedId = HttpUtility.HtmlDecode(id);
             var plugins = new List<string> { decodedId };
-            return Ok(  CallCacheData(plugins) );
+            return Ok(CallCacheData(plugins));
         }
 
         catch (Exception ex)
@@ -48,12 +47,12 @@ public class DataController : Controller
             Debug.WriteLine($"Error in GetCacheData: {ex.Message}");
             return StatusCode(500, $"Internal error fetching plugin data. {ex.Message}");
         }
-
     }
 
-    private List<KeyValuePair<string, string>> CallCacheData(List<String> required)
+    private List<KeyValuePair<string, string>> CallCacheData(List<string> required)
     {
         if (_pluginSettings?.GetCacheData is null) throw new NotImplementedException("No Primary cache defined");
+
         var data = _pluginSettings.GetCacheData(required);
         Debug.WriteLine($"Data returned from GetCacheData: {data.Count} items");
         return data;
