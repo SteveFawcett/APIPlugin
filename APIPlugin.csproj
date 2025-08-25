@@ -43,7 +43,11 @@
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)' == 'Release'">
-		<PackageReference Include="BroadcastPluginSDK" Version="1.0.6" />
+		<PackageReference Include="BroadcastPluginSDK" Version="1.0.17" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="APIPlugin-v0.0.1.zip" />
 	</ItemGroup>
 
 	<ItemGroup>
