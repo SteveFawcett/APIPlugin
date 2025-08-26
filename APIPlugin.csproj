@@ -22,21 +22,25 @@
 		<RepositoryUrl>https://github.com/SteveFawcett/APIPlugin</RepositoryUrl>
 	</PropertyGroup>
 
-	<Target Name="Package" DependsOnTargets="Publish">
-		<MakeDir Directories="$(PackageDir)" />
-		<ZipDirectory Overwrite="true" SourceDirectory="$(MSBuildProjectDirectory)/$(PublishDir)" DestinationFile="$(PackagePath)" />
-	</Target>
-	<Target Name="PackageClean" AfterTargets="Clean">
-		<Delete Files="$(PackagePath)" />
-	</Target>
-
-
 	<ItemGroup>
-	  <Compile Remove="Resources\**" />
-	  <EmbeddedResource Remove="Resources\**" />
-	  <None Remove="Resources\**" />
+	  <Content Remove=".\APIPlugin-v0.0.1.zip" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<Content Include="$(PackagePath)">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToPublishDirectory>Always</CopyToPublishDirectory>
+		</Content>
+	</ItemGroup>
+
+	<Target Name="AutoPackage" AfterTargets="Publish">
+		<Message Importance="High" Text="📦 Packaging plugin to $(PackagePath)" />
+		<MakeDir Directories="$(PackageDir)" />
+		<ZipDirectory Overwrite="true" SourceDirectory="$(MSBuildProjectDirectory)/$(PublishDir)" DestinationFile="$(PackagePath)" />
+		<Copy SourceFiles="$(PackagePath)" DestinationFolder="$(MSBuildProjectDirectory)/$(PublishDir)" />
+		<Copy SourceFiles="$(PackagePath)" DestinationFolder="$(AppData)/Broadcast/Plugins" Condition="'$(Configuration)' == 'Debug'" />
+		<Message Importance="High" Text="📦 Copying package $(AppData)/Broadcast/Plugins" Condition="'$(Configuration)' == 'Debug'" />
+	</Target>
 
 	<ItemGroup Condition="'$(Configuration)' == 'Debug'">
 		<ProjectReference Include="..\BroadcastPluginSDK\BroadcastPluginSDK.csproj" />
