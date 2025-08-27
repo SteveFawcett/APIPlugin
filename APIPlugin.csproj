@@ -6,11 +6,13 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-		<PackageDir Condition="'$(PackageDir)' == ''">$([System.IO.Path]::Combine($(OutputPath),'package'))/</PackageDir>
-		<OutputDirectory>.</OutputDirectory>
-		<AssemblyVersion>0.0.1</AssemblyVersion>
+
+		<OutputDirectory>$(AppData)\Broadcast\Plugins\</OutputDirectory>
+		<PackageDir Condition="'$(PackageDir)' == ''">$([System.IO.Path]::Combine($(OutputDirectory),''))/</PackageDir>
 		<PackageFileName>$(AssemblyName)-v$(AssemblyVersion).zip</PackageFileName>
-		<PackagePath>$(OutputDirectory)\$(PackageFileName)</PackagePath>
+		<PackagePath>$(PackageDir)\$(PackageFileName)</PackagePath>
+
+		<AssemblyVersion>0.0.1</AssemblyVersion>
 		<SupportedOSPlatformVersion>8.0</SupportedOSPlatformVersion>
 		<RepositoryType>git</RepositoryType>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
@@ -22,24 +24,17 @@
 		<RepositoryUrl>https://github.com/SteveFawcett/APIPlugin</RepositoryUrl>
 	</PropertyGroup>
 
-	<ItemGroup>
-	  <Content Remove=".\APIPlugin-v0.0.1.zip" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Content Include="$(PackagePath)">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<CopyToPublishDirectory>Always</CopyToPublishDirectory>
-		</Content>
-	</ItemGroup>
-
 	<Target Name="AutoPackage" AfterTargets="Publish">
 		<Message Importance="High" Text="📦 Packaging plugin to $(PackagePath)" />
 		<MakeDir Directories="$(PackageDir)" />
 		<ZipDirectory Overwrite="true" SourceDirectory="$(MSBuildProjectDirectory)/$(PublishDir)" DestinationFile="$(PackagePath)" />
-		<Copy SourceFiles="$(PackagePath)" DestinationFolder="$(MSBuildProjectDirectory)/$(PublishDir)" />
+
+		<Message Importance="High" Text="📦 Copying package from $(PackagePath) To $(MSBuildProjectDirectory)/$(PublishDir) " />
+		<Copy SourceFiles="$(PackagePath)" DestinationFolder="$(MSBuildProjectDirectory)/$(PublishDir)" Condition="'$(Configuration)' == 'Debug'" />
+
 		<Copy SourceFiles="$(PackagePath)" DestinationFolder="$(AppData)/Broadcast/Plugins" Condition="'$(Configuration)' == 'Debug'" />
 		<Message Importance="High" Text="📦 Copying package $(AppData)/Broadcast/Plugins" Condition="'$(Configuration)' == 'Debug'" />
+
 	</Target>
 
 	<ItemGroup Condition="'$(Configuration)' == 'Debug'">
@@ -47,11 +42,7 @@
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)' == 'Release'">
-		<PackageReference Include="BroadcastPluginSDK" Version="1.0.17" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Remove="APIPlugin-v0.0.1.zip" />
+		<PackageReference Include="BroadcastPluginSDK" Version="1.1.1" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -71,6 +62,7 @@
 	  <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.8">
 	  </PackageReference>
   </ItemGroup>
+
 
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">

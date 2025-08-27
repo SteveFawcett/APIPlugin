@@ -14,7 +14,7 @@ namespace APIPlugin;
 
 public class PluginBase : BroadcastPluginBase 
 {
-    private const string Stanza = "API";
+    private const string STANZA = "API";
     private readonly IWebHost? _webhost;
     private static readonly Image s_icon = Resources.green;
     private readonly ILogger<IPlugin> _logger;
@@ -48,11 +48,11 @@ public class PluginBase : BroadcastPluginBase
     #region IPlugin Members
 
     public PluginBase(IConfiguration configuration , ILogger<IPlugin> logger ) :
-        base(configuration, null, s_icon,  Stanza)
+        base(configuration, null, s_icon,  STANZA)
     {
         _logger = logger;
         
-        _webhost = CreateWebHostBuilder(configuration.GetSection(Stanza));
+        _webhost = CreateWebHostBuilder(configuration.GetSection(STANZA));
 
         Task.Run(() => InitializeWebHost());
     }
