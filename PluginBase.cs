@@ -47,6 +47,8 @@ public class PluginBase : BroadcastPluginBase
 
     #region IPlugin Members
 
+    public PluginBase() :base() {}
+
     public PluginBase(IConfiguration configuration , ILogger<IPlugin> logger ) :
         base(configuration, null, s_icon,  STANZA)
     {
