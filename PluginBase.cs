@@ -17,7 +17,7 @@ public class PluginBase : BroadcastPluginBase
     private const string STANZA = "API";
     private readonly IWebHost? _webhost;
     private static readonly Image s_icon = Resources.green;
-    private readonly ILogger<IPlugin> _logger;
+    private readonly ILogger<IPlugin>? _logger;
 
     public class PluginSettings
     {
@@ -67,7 +67,7 @@ public class PluginBase : BroadcastPluginBase
     private IWebHost CreateWebHostBuilder(IConfiguration configuration)
     {
         var address = $"http://{configuration["server"]}:{configuration["port"]}";
-        _logger.LogInformation("Starting API server on {address}" , address);
+        _logger?.LogInformation("Starting API server on {address}" , address);
 
         return WebHost.CreateDefaultBuilder()
             .UseUrls(address)
