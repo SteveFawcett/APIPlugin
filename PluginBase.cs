@@ -53,7 +53,9 @@ public class PluginBase : BroadcastPluginBase
         base(configuration, null, s_icon,  STANZA)
     {
         _logger = logger;
-        
+        _logger.LogInformation("API Plugin initializing...");
+
+
         _webhost = CreateWebHostBuilder(configuration.GetSection(STANZA));
 
         Task.Run(() => InitializeWebHost());
