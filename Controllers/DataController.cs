@@ -50,7 +50,7 @@ public class DataController : Controller
 
             var decodedId = HttpUtility.HtmlDecode(id);
 
-            WriteMessage($"Received GET request: {fullUrl} ID: {id}");
+            WriteMessage($"Received GET request: {fullUrl} ID: {decodedId}");
 
             var plugins = new List<string> { decodedId };
             return Ok(CallCacheData(plugins));
