@@ -1,100 +1,117 @@
-﻿using APIPlugin.Properties;
+﻿using APIPlugin.Forms;
+using APIPlugin.Properties;
 using BroadcastPluginSDK.abstracts;
 using BroadcastPluginSDK.Classes;
 using BroadcastPluginSDK.Interfaces;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using static APIPlugin.Forms.InfoPanel;
 
 namespace APIPlugin;
 
-public class PluginBase : BroadcastPluginBase 
+public class PluginBase : BroadcastPluginBase
 {
     private const string STANZA = "API";
-    private readonly IWebHost? _webhost;
     private static readonly Image s_icon = Resources.green;
     private readonly ILogger<IPlugin>? _logger;
+    private static InfoPanel? _infoPage;
+    private IWebHost? _webHost;
 
     public class PluginSettings
     {
-        public GetCacheDataDelegate? GetCacheData;
+        public WriteMessageDelegate WriteMessage { get; set; } = null!;
+        public GetCacheDataDelegate? GetCacheData { get; set; }
     }
 
     public class PluginSettingsAccessor
     {
         public PluginSettings Current { get; set; } = new();
-    }
 
-    public class Startup( PluginSettingsAccessor accessor ) 
-    {
-        public void ConfigureServices(IServiceCollection services)
+        public PluginSettingsAccessor(WriteMessageDelegate writeMessage)
         {
-            services.AddMvc();
-            services.AddSingleton( accessor); // Already registered in CreateWebHostBuilder
-        }
-
-        public static void Configure(IApplicationBuilder app, IHostingEnvironment env)
-        {
-            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
-
-            app.UseMvc();
+            Current.WriteMessage = writeMessage;
         }
     }
 
-    #region IPlugin Members
+    public PluginBase() : base() { }
 
-    public PluginBase() :base() {}
-
-    public PluginBase(IConfiguration configuration , ILogger<IPlugin> logger ) :
-        base(configuration, null, s_icon,  STANZA)
+    public PluginBase(IConfiguration configuration, ILogger<IPlugin> logger)
+        : base(configuration, CreatePage(), s_icon, STANZA)
     {
         _logger = logger;
         _logger.LogInformation("API Plugin initializing...");
 
-
-        _webhost = CreateWebHostBuilder(configuration.GetSection(STANZA));
-
-        Task.Run(() => InitializeWebHost());
+        _webHost = CreateWebHost(configuration.GetSection(STANZA));
+        Task.Run(() => StartWebHost()); // Fire-and-forget
     }
 
-    private void InitializeWebHost()
+    private static IInfoPage CreatePage()
     {
-        _webhost.Run();
+        _infoPage = new InfoPanel();
+        return _infoPage as IInfoPage;
     }
 
-    private IWebHost CreateWebHostBuilder(IConfiguration configuration)
+    private void StartWebHost()
+    {
+        try
+        {
+            _webHost?.Start();
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "Failed to start API web host.");
+        }
+    }
+
+    private IWebHost CreateWebHost(IConfiguration configuration)
     {
         var address = $"http://{configuration["server"]}:{configuration["port"]}";
-        _logger?.LogInformation("Starting API server on {address}" , address);
+        _logger?.LogInformation("Starting API server on {address}", address);
 
-        return WebHost.CreateDefaultBuilder()
+        return new WebHostBuilder()
+            .UseKestrel()
             .UseUrls(address)
             .ConfigureServices(services =>
             {
-                services.AddSingleton(configuration);
-                services.AddSingleton<PluginSettingsAccessor>();
                 services.AddMvc();
+                services.AddSingleton(configuration);
+                services.AddSingleton<PluginSettingsAccessor>(sp => new PluginSettingsAccessor(_infoPage.WriteMessage));
             })
-            .UseStartup<Startup>()
+            .Configure(app =>
+            {
+                var env = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
+                if (env.IsDevelopment())
+                    app.UseDeveloperExceptionPage();
+                app.Use(async (context, next) =>
+                {
+                    var sw = Stopwatch.StartNew();
+                    await next();
+                    sw.Stop();
+                    var logger = context.RequestServices.GetService<ILogger<PluginBase>>();
+                    logger?.LogInformation("Request to {Path} took {Elapsed}ms", context.Request.Path, sw.ElapsedMilliseconds);
+                });
+
+                app.UseMvc();
+            })
             .Build();
     }
 
     public override GetCacheDataDelegate? GetCacheData
     {
-        get => _webhost?.Services.GetRequiredService<PluginSettingsAccessor>().Current.GetCacheData;
+        get => _webHost?.Services.GetRequiredService<PluginSettingsAccessor>().Current.GetCacheData;
         set
         {
-            if (_webhost == null)
+            if (_webHost == null)
             {
                 Debug.WriteLine("Web host is not initialized. Cannot set GetCacheData.");
                 return;
             }
-            _webhost.Services.GetRequiredService<PluginSettingsAccessor>().Current.GetCacheData = value;
+
+            _webHost.Services.GetRequiredService<PluginSettingsAccessor>().Current.GetCacheData = value;
         }
     }
-    #endregion
 }
